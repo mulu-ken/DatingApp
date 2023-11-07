@@ -43,7 +43,6 @@ export class AccountService {
        return user;
      })
    )
-
   }
 
   logout(){
