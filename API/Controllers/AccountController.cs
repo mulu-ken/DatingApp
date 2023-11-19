@@ -1,4 +1,5 @@
 
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,7 +43,8 @@ namespace API.Controllers
             return new UserDTo
             {
                 UserName = user.UserName,
-                Token = _tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user),
+                photoUrl = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url
             };
 
         }
@@ -52,7 +54,9 @@ namespace API.Controllers
         public async Task<ActionResult<UserDTo>> Login(LoginDTo loginDTo)
         {
 
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == loginDTo.Username);
+            var user = await _context.Users
+                .Include(p => p.Photos)
+                .SingleOrDefaultAsync(x => x.UserName == loginDTo.Username);
 
             if (user == null) return Unauthorized();
 
@@ -68,7 +72,8 @@ namespace API.Controllers
             return new UserDTo
             {
                 UserName = user.UserName,
-                Token = _tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user),
+                photoUrl = user?.Photos?.FirstOrDefault(x => x.IsMain)?.Url
             };
         }
 
